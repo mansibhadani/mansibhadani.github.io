@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- EDIT: Page title shown in browser tab -->
+<title>Mansi Bhadani — Data Engineer</title>
+
+<!-- EDIT: Description shown in Google search results -->
+<meta name="description" content="Data Engineer based in New York. MS CS at Pace University. Building real-time pipelines with Kafka, Spark, and Snowflake.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Geist+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ================================================================
+   DESIGN TOKENS — change colors/fonts here, everything updates
+   ================================================================ */
+:root {
+  --bg:      #fafaf8;   /* page background */
+  --bg2:     #f3f2ef;   /* subtle surface (cards, tags) */
+  --surface: #ffffff;   /* sidebar + card white */
+  --border:  #e5e3de;   /* light border */
+  --border2: #d0ceca;   /* medium border (hover) */
+  --text:    #1a1a18;   /* primary text */
+  --text2:   #5a5852;   /* secondary text */
+  --text3:   #9a978f;   /* muted / labels */
+  --link:    #2563eb;   /* blue links */
+  --green:   #16a34a;   /* availability dot + GPA */
+  --mono:    'Geist Mono', monospace;
+  --sans:    'Geist', sans-serif;
+  --serif:   'Newsreader', serif;
+}
+
+/* ================================================================
+   BASE RESET
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 15px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ================================================================
+   SIDEBAR — fixed left column
+   ================================================================ */
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  border-right: 1px solid var(--border);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  background: var(--surface);
+  z-index: 100;
+}
+.sidebar-logo {
+  width: 36px; height: 36px;
+  background: var(--text);
+  color: var(--bg);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  font-size: 14px; font-weight: 500;
+  margin-bottom: 40px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.nav-links { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.nav-link {
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  border: none; background: transparent;
+  text-align: left; font-family: var(--sans);
+}
+.nav-link:hover  { background: var(--bg2); color: var(--text); }
+.nav-link.active { background: var(--bg2); color: var(--text); font-weight: 500; }
+.sidebar-footer {
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.sidebar-social { display: flex; gap: 14px; flex-wrap: wrap; }
+.sidebar-social a {
+  font-size: 12px; color: var(--text3);
+  text-decoration: none; font-family: var(--mono);
+  transition: color 0.15s;
+}
+.sidebar-social a:hover { color: var(--text); }
+.avail-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-family: var(--mono);
+  color: var(--green);
+}
+.avail-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+/* ================================================================
+   MAIN LAYOUT — centered content column
+   justify-content: center = equal space left and right of content
+   ================================================================ */
+.main {
+  margin-left: 220px;
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;  /* ← this centers the content */
+}
+.content {
+  width: 100%;
+  max-width: 640px;          /* ← content never wider than this */
+  padding: 64px 32px 120px 32px;
+}
+
+/* ================================================================
+   PAGE TRANSITIONS
+   ================================================================ */
+.page { display: none; animation: pageIn 0.25s ease; }
+.page.active { display: block; }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ================================================================
+   TYPOGRAPHY
+   ================================================================ */
+h1 {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+}
+h1 em { font-style: italic; color: var(--text2); }
+h2 {
+  font-family: var(--sans);
+  font-size: 13px; font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  margin: 48px 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+p { color: var(--text2); font-size: 15px; line-height: 1.75; margin-bottom: 16px; }
+p strong, p b { color: var(--text); font-weight: 500; }
+p a, a.inline {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: rgba(37,99,235,0.3);
+  cursor: pointer;
+}
+p a:hover, a.inline:hover { text-decoration-color: var(--link); }
+
+/* ================================================================
+   HOME PAGE
+   ================================================================ */
+.home-tagline {
+  font-family: var(--serif);
+  font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+.home-tagline em { font-style: italic; color: var(--text2); }
+.home-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+.home-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text2);
+  text-decoration: none;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.home-link:hover { border-color: var(--text); color: var(--text); background: var(--bg2); }
+.home-link.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+.home-link.primary:hover { opacity: 0.85; }
+.home-section { margin-top: 56px; }
+.home-section-title {
+  font-size: 13px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text3); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.home-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.recent-list { display: flex; flex-direction: column; }
+.recent-item {
+  display: flex; align-items: baseline; gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.recent-item:last-child { border-bottom: none; }
+.recent-item:hover { opacity: 0.7; }
+.recent-date { font-family: var(--mono); font-size: 11px; color: var(--text3); min-width: 80px; flex-shrink: 0; }
+.recent-name { font-size: 14px; color: var(--text); flex: 1; }
+.recent-tag {
+  font-family: var(--mono); font-size: 10px;
+  padding: 2px 8px; border-radius: 4px;
+  background: var(--bg2); color: var(--text3);
+  flex-shrink: 0;
+}
+
+/* ================================================================
+   ABOUT PAGE
+   ================================================================ */
+.about-grid { display: grid; grid-template-columns: 1fr 200px; gap: 48px; align-items: start; margin-bottom: 40px; }
+.avatar-box {
+  width: 160px; height: 160px;
+  border-radius: 12px;
+  background: var(--bg2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+/* To add a real photo: replace <div class="avatar-initials">MB</div>
+   with <img src="your-photo.jpg" style="width:100%;height:100%;object-fit:cover"> */
+.avatar-initials { font-size: 42px; font-weight: 300; color: var(--text2); font-family: var(--mono); }
+.bio-block {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 20px 24px;
+  margin: 24px 0; position: relative;
+}
+.bio-block::before {
+  content: '"';
+  position: absolute; top: -12px; left: 16px;
+  font-family: var(--serif); font-size: 40px;
+  color: var(--border2); line-height: 1;
+}
+.bio-text { font-family: var(--serif); font-style: italic; font-size: 16px; line-height: 1.7; color: var(--text2); }
+.copy-bio-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border: 1px solid var(--border2);
+  border-radius: 5px; font-size: 12px;
+  color: var(--text3); cursor: pointer;
+  background: transparent; font-family: var(--sans);
+  transition: all 0.15s; margin-top: 12px;
+  text-decoration: none;
+}
+.copy-bio-btn:hover { border-color: var(--text); color: var(--text); background: var(--bg2); }
+.toolbox { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.tool-pill {
+  padding: 5px 14px; border: 1px solid var(--border2);
+  border-radius: 20px; font-family: var(--mono); font-size: 12px;
+  color: var(--text2); background: var(--surface);
+  transition: all 0.15s; cursor: default;
+}
+.tool-pill:hover { border-color: var(--text2); color: var(--text); }
+.edu-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+.edu-item:last-child { border-bottom: none; }
+.edu-logo {
+  width: 40px; height: 40px; border-radius: 8px;
+  background: var(--bg2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+  font-family: var(--mono); font-weight: 500; color: var(--text2);
+}
+.edu-school { font-weight: 500; font-size: 14px; margin-bottom: 2px; }
+.edu-degree { font-size: 13px; color: var(--text2); }
+.edu-meta { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-top: 4px; }
+.gpa-badge { display: inline-flex; align-items: center; gap: 4px; font-family: var(--mono); font-size: 11px; color: var(--green); margin-left: 8px; }
+
+/* ================================================================
+   ARTICLES PAGE
+   ================================================================ */
+.article-list { display: flex; flex-direction: column; }
+.article-item {
+  padding: 20px 0; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: opacity 0.15s;
+  text-decoration: none; display: block;
+}
+.article-item:last-child { border-bottom: none; }
+.article-item:hover { opacity: 0.7; }
+.article-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 5px; }
+.article-excerpt { font-size: 13px; color: var(--text2); line-height: 1.55; margin-bottom: 8px; }
+.article-meta { display: flex; gap: 12px; align-items: center; }
+.article-date { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.article-tag-pill { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 4px; background: var(--bg2); color: var(--text3); }
+
+/* ================================================================
+   PROJECTS PAGE
+   ================================================================ */
+.featured-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 0; }
+.feat-card {
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px; text-decoration: none; cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: var(--surface); display: block;
+}
+.feat-card:hover { border-color: var(--border2); box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.feat-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+.feat-desc { font-size: 13px; color: var(--text2); line-height: 1.55; margin-bottom: 12px; }
+.feat-metric { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.feat-metric span { color: var(--text); font-weight: 500; }
+.all-projects-list { display: flex; flex-direction: column; }
+.year-group-title { font-family: var(--mono); font-size: 12px; color: var(--text3); padding: 20px 0 10px; border-bottom: 1px solid var(--border); }
+.proj-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 13px 0; border-bottom: 1px solid var(--border);
+  cursor: pointer; text-decoration: none;
+  transition: opacity 0.15s;
+}
+.proj-row:hover { opacity: 0.65; }
+.proj-row:last-child { border-bottom: none; }
+.proj-name { font-size: 14px; color: var(--text); flex: 1; }
+.proj-desc-short { font-size: 13px; color: var(--text3); flex: 2; }
+.proj-arrow { font-size: 12px; color: var(--text3); }
+
+/* ================================================================
+   WORK PAGE
+   ================================================================ */
+.work-list { display: flex; flex-direction: column; }
+.work-item { display: flex; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+.work-item:last-child { border-bottom: none; }
+.company-logo {
+  width: 44px; height: 44px; border-radius: 8px;
+  background: var(--bg2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.work-role { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+.work-company { font-size: 13px; color: var(--text2); }
+.work-duration { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-top: 3px; }
+.work-bullets { margin-top: 10px; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.work-bullets li { font-size: 13px; color: var(--text2); padding-left: 12px; position: relative; line-height: 1.55; }
+.work-bullets li::before { content: '–'; position: absolute; left: 0; color: var(--text3); }
+.work-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.work-tag { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); color: var(--text3); }
+.badge { display: inline-flex; align-items: center; font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 4px; background: rgba(22,163,74,0.08); border: 1px solid rgba(22,163,74,0.2); color: var(--green); margin-left: 8px; vertical-align: middle; }
+.award-item { padding: 16px 0; border-bottom: 1px solid var(--border); }
+.award-item:last-child { border-bottom: none; }
+.award-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.award-meta { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+.award-desc { font-size: 13px; color: var(--text2); line-height: 1.55; }
+
+/* ================================================================
+   USES PAGE
+   ================================================================ */
+.uses-list { display: flex; flex-direction: column; }
+.uses-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.uses-item:last-child { border-bottom: none; }
+.uses-name { font-size: 14px; font-weight: 500; min-width: 140px; flex-shrink: 0; }
+.uses-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+/* ================================================================
+   CONTACT PAGE
+   ================================================================ */
+.contact-links-grid { display: flex; flex-direction: column; }
+.contact-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 0; border-bottom: 1px solid var(--border);
+  text-decoration: none; cursor: pointer;
+  transition: opacity 0.15s;
+}
+.contact-row:last-child { border-bottom: none; }
+.contact-row:hover { opacity: 0.65; }
+.contact-row-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--bg2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.contact-row-label { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-bottom: 2px; }
+.contact-row-value { font-size: 14px; color: var(--text); }
+.contact-status-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px 24px; margin-top: 40px; }
+.cs-title { font-size: 13px; font-weight: 500; margin-bottom: 16px; color: var(--text); }
+.cs-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.cs-row:last-child { border-bottom: none; }
+.cs-key { color: var(--text3); }
+.cs-val { color: var(--text); }
+.cs-val.open { color: var(--green); }
+
+/* ================================================================
+   SCROLLBAR
+   ================================================================ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ================================================================
+   TABLET (769px – 1100px)
+   ================================================================ */
+@media(min-width:769px) and (max-width:1100px) {
+  .sidebar  { width: 180px; padding: 24px 18px; }
+  .main     { margin-left: 180px; justify-content: center; }
+  .content  { padding: 48px 24px 100px 24px; max-width: 600px; }
+}
+
+/* ================================================================
+   MOBILE (under 768px) — sidebar becomes sticky top bar
+   ================================================================ */
+@media(max-width:768px) {
+  body      { flex-direction: column; }
+  .sidebar  { width: 100%; min-height: auto; position: sticky; top: 0; z-index: 100; border-right: none; border-bottom: 1px solid var(--border); padding: 12px 16px; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .sidebar-logo    { margin-bottom: 0; width: 28px; height: 28px; font-size: 11px; }
+  .nav-links       { flex-direction: row; flex: none; flex-wrap: wrap; gap: 2px; }
+  .sidebar-footer  { display: none; }
+  .main     { margin-left: 0; justify-content: center; }
+  .content  { padding: 24px 20px 60px 20px; max-width: 100%; }
+  .about-grid      { grid-template-columns: 1fr; }
+  .avatar-box      { display: none; }
+  .featured-grid   { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     SIDEBAR — edit your name initial, nav links, social links here
+     ================================================================ -->
+<aside class="sidebar">
+
+  <!-- EDIT: Change "M" to your initial -->
+  <div class="sidebar-logo" onclick="showPage('home')">M</div>
+
+  <nav class="nav-links">
+    <button class="nav-link active" data-page="home"     onclick="showPage('home')">Home</button>
+    <button class="nav-link"        data-page="about"    onclick="showPage('about')">About</button>
+    <button class="nav-link"        data-page="articles" onclick="showPage('articles')">Articles</button>
+    <button class="nav-link"        data-page="projects" onclick="showPage('projects')">Projects</button>
+    <button class="nav-link"        data-page="work"     onclick="showPage('work')">Work</button>
+    <button class="nav-link"        data-page="uses"     onclick="showPage('uses')">Uses</button>
+    <button class="nav-link"        data-page="contact"  onclick="showPage('contact')">Contact</button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <!-- EDIT: Change availability status text -->
+    <div class="avail-badge">
+      <div class="avail-dot"></div>
+      Actively interviewing
+    </div>
+    <!-- EDIT: Update your email, GitHub, LinkedIn URLs -->
+    <div class="sidebar-social">
+      <a href="mailto:mansi.bhadani31@gmail.com">Email</a>
+      <a href="https://github.com/mansibhadani" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/mansibhadani" target="_blank">LinkedIn</a>
+    </div>
+  </div>
+
+</aside>
+
+<!-- ================================================================
+     MAIN CONTENT
+     ================================================================ -->
+<main class="main">
+<div class="content">
+
+
+<!-- ================================================================
+     PAGE: HOME
+     EDIT: name, tagline, bio paragraph, button links, project list,
+           writing list
+     ================================================================ -->
+<div class="page active" id="page-home">
+
+  <!-- EDIT: Your name and role -->
+  <div class="home-tagline">
+    Mansi Bhadani<br>
+    <em>Data Engineer.</em>
+  </div>
+
+  <!-- EDIT: 2–3 sentence intro -->
+  <p style="max-width:520px">
+    I build real-time data infrastructure at scale — Kafka pipelines, Spark streaming
+    jobs, Snowflake data models — with a focus on reliability and observability.
+    Currently finishing my <strong>MS in CS at Pace University</strong> (GPA 3.82).
+    Based in New York, available now.
+  </p>
+
+  <!-- EDIT: Update links with your real URLs -->
+  <div class="home-links">
+    <span class="home-link primary" onclick="showPage('contact')">Get in touch</span>
+    <a class="home-link" href="mailto:mansi.bhadani31@gmail.com">Email</a>
+    <a class="home-link" href="https://github.com/mansibhadani" target="_blank">GitHub</a>
+    <a class="home-link" href="https://linkedin.com/in/mansibhadani" target="_blank">LinkedIn</a>
+  </div>
+
+  <!-- EDIT: Recent projects list — add/remove rows as needed -->
+  <div class="home-section">
+    <div class="home-section-title">Recent Projects</div>
+    <div class="recent-list">
+      <div class="recent-item" onclick="showPage('projects')">
+        <div class="recent-date">2025</div>
+        <div class="recent-name">NYC Transit Real-Time Streaming Pipeline</div>
+        <div class="recent-tag">Kafka · Spark · Snowflake</div>
+      </div>
+      <div class="recent-item" onclick="showPage('projects')">
+        <div class="recent-date">2025</div>
+        <div class="recent-name">dbt + Snowflake Modern Data Stack</div>
+        <div class="recent-tag">dbt · Airflow</div>
+      </div>
+      <div class="recent-item" onclick="showPage('projects')">
+        <div class="recent-date">2024</div>
+        <div class="recent-name">Real-Time Data Quality Monitoring Framework</div>
+        <div class="recent-tag">Great Expectations · Python</div>
+      </div>
+      <div class="recent-item" onclick="showPage('projects')">
+        <div class="recent-date">2023</div>
+        <div class="recent-name">Mortgage Risk ML Pipeline</div>
+        <div class="recent-tag">PySpark · Iceberg</div>
+      </div>
+      <div class="recent-item" onclick="showPage('projects')">
+        <div class="recent-date">2023</div>
+        <div class="recent-name">Real-Time PII Redaction System</div>
+        <div class="recent-tag">BERT · Kafka</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT: Writing/articles preview — update titles, dates, links -->
+  <div class="home-section">
+    <div class="home-section-title">Writing</div>
+    <div class="recent-list">
+      <div class="recent-item" onclick="showPage('articles')">
+        <div class="recent-date">Nov 2025</div>
+        <div class="recent-name">Why I chose Kafka over Kinesis for the NJ Transit pipeline</div>
+        <div class="recent-tag">Streaming</div>
+      </div>
+      <div class="recent-item" onclick="showPage('articles')">
+        <div class="recent-date">Oct 2025</div>
+        <div class="recent-name">Apache Iceberg's hidden superpower: time-travel queries</div>
+        <div class="recent-tag">Storage</div>
+      </div>
+      <div class="recent-item" onclick="showPage('articles')">
+        <div class="recent-date">Sep 2025</div>
+        <div class="recent-name">dbt tests that actually catch real data quality issues</div>
+        <div class="recent-tag">Data Quality</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-home -->
+
+
+<!-- ================================================================
+     PAGE: ABOUT
+     EDIT: bio paragraphs, bio quote, toolbox pills, education,
+           certifications. To add photo: see avatar comment in CSS.
+     ================================================================ -->
+<div class="page" id="page-about">
+  <h1>Build. Ship. <em>Learn.</em></h1>
+
+  <div class="about-grid">
+    <div>
+      <!-- EDIT: Your about paragraphs -->
+      <p>
+        I'm <strong>Mansi Bhadani</strong> — a data engineer finishing my MS in
+        Computer Science at Pace University (GPA 3.82), graduating May 2026.
+        I've built data systems through a <strong>data analytics externship at
+        Beats by Dre</strong>, graduate research at Pace, and independent
+        engineering projects in transit, finance, and NLP domains.
+      </p>
+      <p>
+        My focus is the gap between raw messy data and reliable analytics —
+        the ETL pipelines, streaming jobs, and quality checks that nobody sees
+        but everyone depends on. I care about systems that
+        <strong>don't break at 2 AM</strong>.
+      </p>
+      <p>
+        Based in <strong>New York City</strong>. When I'm not building pipelines
+        I'm running in Central Park or reading systems papers.
+      </p>
+      <p>
+        <strong>Currently:</strong> actively interviewing for data engineering
+        roles at companies building infrastructure at scale.
+      </p>
+    </div>
+    <div>
+      <!-- EDIT: Replace "MB" with your initials, or swap for a photo.
+           To use a photo: <img src="photo.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:12px"> -->
+      <div class="avatar-box">
+        <div class="avatar-initials">MB</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT: Your professional bio (used for "Copy Bio" button) -->
+  <div class="bio-block">
+    <p class="bio-text">
+      Mansi Bhadani is a results-driven Data Engineer with hands-on experience
+      building scalable ETL and real-time streaming pipelines. She specializes
+      in PySpark, Kafka, and Snowflake — and has built engineering systems
+      including a transit streaming pipeline processing millions of events daily
+      and an NLP-powered analytics platform during her externship at Beats by Dre.
+    </p>
+  </div>
+  <button class="copy-bio-btn" onclick="copyBio()">⎘ Copy Bio</button>
+  &nbsp;
+  <a class="copy-bio-btn" href="mailto:mansi.bhadani31@gmail.com">↓ Request Resume</a>
+
+  <!-- EDIT: Add/remove tool pills -->
+  <h2>My Toolbox</h2>
+  <div class="toolbox">
+    <div class="tool-pill">Python</div>
+    <div class="tool-pill">SQL</div>
+    <div class="tool-pill">Scala</div>
+    <div class="tool-pill">Apache Kafka</div>
+    <div class="tool-pill">PySpark</div>
+    <div class="tool-pill">Airflow</div>
+    <div class="tool-pill">dbt</div>
+    <div class="tool-pill">Snowflake</div>
+    <div class="tool-pill">Apache Iceberg</div>
+    <div class="tool-pill">AWS</div>
+    <div class="tool-pill">GCP</div>
+    <div class="tool-pill">BigQuery</div>
+    <div class="tool-pill">Kubernetes</div>
+    <div class="tool-pill">Docker</div>
+    <div class="tool-pill">Terraform</div>
+    <div class="tool-pill">Great Expectations</div>
+    <div class="tool-pill">OpenLineage</div>
+    <div class="tool-pill">GitHub Actions</div>
+  </div>
+
+  <!-- EDIT: Education — update school, degree, dates, GPA -->
+  <h2>Education</h2>
+  <div class="edu-item">
+    <div class="edu-logo">P</div>
+    <div>
+      <div class="edu-school">Pace University <span class="gpa-badge">▲ 3.82 GPA</span></div>
+      <div class="edu-degree">Master of Science, Computer Science</div>
+      <div class="edu-meta">New York, NY · Aug 2024 – May 2026</div>
+    </div>
+  </div>
+
+  <!-- EDIT: Certifications — add/remove as needed -->
+  <h2>Certifications</h2>
+  <div class="edu-item">
+    <div class="edu-logo" style="font-size:11px">AWS</div>
+    <div>
+      <div class="edu-school">AWS Solutions Architect — Associate</div>
+      <div class="edu-degree">Amazon Web Services · 2024</div>
+    </div>
+  </div>
+  <div class="edu-item">
+    <div class="edu-logo">❄</div>
+    <div>
+      <div class="edu-school">SnowPro Core Certification</div>
+      <div class="edu-degree">Snowflake · 2024</div>
+    </div>
+  </div>
+  <div class="edu-item">
+    <div class="edu-logo">⚡</div>
+    <div>
+      <div class="edu-school">Confluent Certified Developer for Apache Kafka</div>
+      <div class="edu-degree">Confluent · 2025</div>
+    </div>
+  </div>
+
+</div><!-- /page-about -->
+
+
+<!-- ================================================================
+     PAGE: ARTICLES
+     EDIT: article titles, excerpts, dates, real Medium/blog URLs
+     ================================================================ -->
+<div class="page" id="page-articles">
+  <h1>Writing on <em>data engineering.</em></h1>
+  <p style="max-width:520px">I write about streaming systems, data quality, and lessons from building pipelines. Published on Medium.</p>
+
+  <h2>2025</h2>
+  <!-- EDIT: Replace href with your real Medium article URL -->
+  <div class="article-list">
+    <a class="article-item" href="https://medium.com/@mansibhadani" target="_blank">
+      <div class="article-title">Why I chose Kafka over Kinesis for the NJ Transit real-time pipeline</div>
+      <div class="article-excerpt">A breakdown of the architectural decision — partition semantics, consumer group replay, and why Confluent's Schema Registry was the deciding factor over AWS Kinesis.</div>
+      <div class="article-meta">
+        <div class="article-date">Nov 2025</div>
+        <div class="article-tag-pill">Streaming</div>
+        <div class="article-tag-pill">Kafka</div>
+      </div>
+    </a>
+    <a class="article-item" href="https://medium.com/@mansibhadani" target="_blank">
+      <div class="article-title">Apache Iceberg's hidden superpower: time-travel queries in production</div>
+      <div class="article-excerpt">How I migrated 10TB of mortgage data from Snowflake to Iceberg on S3, what I gained, what broke, and why snapshot isolation changed how analysts work.</div>
+      <div class="article-meta">
+        <div class="article-date">Oct 2025</div>
+        <div class="article-tag-pill">Storage</div>
+        <div class="article-tag-pill">Iceberg</div>
+      </div>
+    </a>
+    <a class="article-item" href="https://medium.com/@mansibhadani" target="_blank">
+      <div class="article-title">dbt tests that actually catch real data quality issues (not just null checks)</div>
+      <div class="article-excerpt">Beyond not_null and unique: building custom dbt tests for range validation, cross-table referential integrity, and statistical drift detection.</div>
+      <div class="article-meta">
+        <div class="article-date">Sep 2025</div>
+        <div class="article-tag-pill">dbt</div>
+        <div class="article-tag-pill">Data Quality</div>
+      </div>
+    </a>
+    <a class="article-item" href="https://medium.com/@mansibhadani" target="_blank">
+      <div class="article-title">Watermarks in Spark Structured Streaming: what they actually do</div>
+      <div class="article-excerpt">A practical guide to event-time watermarks — when late data gets dropped, why stateful aggregation memory grows, and how to tune window size for your SLA.</div>
+      <div class="article-meta">
+        <div class="article-date">Aug 2025</div>
+        <div class="article-tag-pill">Spark</div>
+        <div class="article-tag-pill">Streaming</div>
+      </div>
+    </a>
+  </div>
+
+  <h2>2024</h2>
+  <div class="article-list">
+    <a class="article-item" href="https://medium.com/@mansibhadani" target="_blank">
+      <div class="article-title">Building a dead-letter queue for your Kafka pipeline the right way</div>
+      <div class="article-excerpt">Every streaming pipeline drops records. Here's how to route them to a dead-letter topic with structured failure reasons, and build a Slack alert before your downstream notices.</div>
+      <div class="article-meta">
+        <div class="article-date">Dec 2024</div>
+        <div class="article-tag-pill">Kafka</div>
+        <div class="article-tag-pill">Ops</div>
+      </div>
+    </a>
+    <a class="article-item" href="https://medium.com/@mansibhadani" target="_blank">
+      <div class="article-title">How I passed the SnowPro Core exam in 3 weeks while in grad school</div>
+      <div class="article-excerpt">Study plan, resource list, the 5 topic areas that actually appear on the exam, and the one practice test worth paying for.</div>
+      <div class="article-meta">
+        <div class="article-date">Nov 2024</div>
+        <div class="article-tag-pill">Career</div>
+        <div class="article-tag-pill">Snowflake</div>
+      </div>
+    </a>
+  </div>
+
+</div><!-- /page-articles -->
+
+
+<!-- ================================================================
+     PAGE: PROJECTS
+     EDIT: featured card titles/descriptions/metrics/links,
+           and the all-projects list below
+     ================================================================ -->
+<div class="page" id="page-projects">
+  <h1>Work. Side projects. <em>Open source.</em></h1>
+  <p style="max-width:520px;margin-bottom:32px">Engineering projects demonstrating depth in streaming, data quality, and cloud infrastructure.</p>
+
+  <!-- EDIT: Update href to your real GitHub repo URLs -->
+  <h2>Featured Projects</h2>
+  <div class="featured-grid">
+    <a class="feat-card" href="https://github.com/mansibhadani/nyc-transit-pipeline" target="_blank">
+      <div class="feat-title">NYC Transit Streaming Pipeline</div>
+      <div class="feat-desc">Academic capstone: MTA GTFS-RT → Kafka → PySpark → Snowflake with Avro schema, 5-point DQ gate, dbt curated layer, Airflow orchestration.</div>
+      <div class="feat-metric"><span>2M+</span> simulated events/day · sub-60s latency</div>
+    </a>
+    <a class="feat-card" href="https://github.com/mansibhadani" target="_blank">
+      <div class="feat-title">Data Quality Monitoring Framework</div>
+      <div class="feat-desc">Automated DQ framework using Great Expectations with custom checks, anomaly detection, and Slack alerting on pipeline failures.</div>
+      <div class="feat-metric"><span>99%</span> data accuracy · automated alerts</div>
+    </a>
+    <a class="feat-card" href="https://github.com/mansibhadani" target="_blank">
+      <div class="feat-title">Mortgage Risk ML Pipeline</div>
+      <div class="feat-desc">Feature engineering on 1M+ records, ensemble models at 92% accuracy. Snowflake → Apache Iceberg migration cutting storage costs 60%.</div>
+      <div class="feat-metric"><span>92%</span> accuracy · 60% cost reduction</div>
+    </a>
+    <a class="feat-card" href="https://github.com/mansibhadani" target="_blank">
+      <div class="feat-title">Real-Time PII Redactor</div>
+      <div class="feat-desc">Kafka Streams + fine-tuned BERT classifying and redacting PII from 1M+ daily records for CCPA/GDPR compliance. Zero-downtime deployment.</div>
+      <div class="feat-metric"><span>1M+</span> records/day · fully compliant</div>
+    </a>
+  </div>
+
+  <!-- EDIT: Add/remove project rows. Format: year header + proj-row items -->
+  <h2>All Projects</h2>
+  <div class="all-projects-list">
+
+    <div class="year-group-title">2025</div>
+    <a class="proj-row" href="https://github.com/mansibhadani/nyc-transit-pipeline" target="_blank">
+      <div class="proj-name">NYC Transit Streaming Pipeline</div>
+      <div class="proj-desc-short">Kafka · PySpark · Snowflake · dbt · Airflow</div>
+      <div class="proj-arrow">↗</div>
+    </a>
+    <a class="proj-row" href="https://github.com/mansibhadani" target="_blank">
+      <div class="proj-name">Modern Data Stack with dbt</div>
+      <div class="proj-desc-short">dbt · Snowflake · GitHub Actions · Metabase</div>
+      <div class="proj-arrow">↗</div>
+    </a>
+    <a class="proj-row" href="https://github.com/mansibhadani" target="_blank">
+      <div class="proj-name">LLM Feature Store Pipeline</div>
+      <div class="proj-desc-short">PySpark · HuggingFace · Pinecone · Apache Iceberg</div>
+      <div class="proj-arrow">↗</div>
+    </a>
+
+    <div class="year-group-title">2024</div>
+    <a class="proj-row" href="https://github.com/mansibhadani" target="_blank">
+      <div class="proj-name">Data Quality Monitoring Framework</div>
+      <div class="proj-desc-short">Great Expectations · Python · Airflow · Slack</div>
+      <div class="proj-arrow">↗</div>
+    </a>
+    <a class="proj-row" href="https://github.com/mansibhadani" target="_blank">
+      <div class="proj-name">Optimized Data Partitioning Research</div>
+      <div class="proj-desc-short">Apache Spark · Python · SQL · Snowflake</div>
+      <div class="proj-arrow">↗</div>
+    </a>
+
+    <div class="year-group-title">2023</div>
+    <a class="proj-row" href="https://github.com/mansibhadani" target="_blank">
+      <div class="proj-name">Mortgage Risk ML Pipeline</div>
+      <div class="proj-desc-short">PySpark · Scikit-learn · Snowflake → Iceberg</div>
+      <div class="proj-arrow">↗</div>
+    </a>
+    <a class="proj-row" href="https://github.com/mansibhadani" target="_blank">
+      <div class="proj-name">Real-Time PII Redaction System</div>
+      <div class="proj-desc-short">Kafka Streams · BERT · Kubernetes · CCPA/GDPR</div>
+      <div class="proj-arrow">↗</div>
+    </a>
+
+    <div class="year-group-title">2022</div>
+    <a class="proj-row" href="https://github.com/mansibhadani" target="_blank">
+      <div class="proj-name">LLM-Powered Airflow DAG Builder</div>
+      <div class="proj-desc-short">NLP · Airflow · Python · Transformers</div>
+      <div class="proj-arrow">↗</div>
+    </a>
+    <a class="proj-row" href="https://github.com/mansibhadani" target="_blank">
+      <div class="proj-name">RDS to Redshift Migration Toolkit</div>
+      <div class="proj-desc-short">Python · SQL · AWS RDS · Redshift</div>
+      <div class="proj-arrow">↗</div>
+    </a>
+
+  </div>
+</div><!-- /page-projects -->
+
+
+<!-- ================================================================
+     PAGE: WORK
+     EDIT: job titles, company names, dates, bullet points, tags.
+     Badge options: <span class="badge">Externship</span>
+                    <span class="badge">Academic</span>
+                    <span class="badge">Intern</span>
+     ================================================================ -->
+<div class="page" id="page-work">
+  <h1>Architect. Scale. <em>Transform.</em></h1>
+  <p style="max-width:540px">My data engineering journey began in 2022 through internships, an externship, and independent engineering projects. Want to work together? <a class="inline" onclick="showPage('contact')">Let's connect.</a></p>
+
+  <h2>Work Experience</h2>
+  <div class="work-list">
+
+    <!-- EDIT: Job 1 -->
+    <div class="work-item">
+      <div class="company-logo">🎵</div>
+      <div style="flex:1">
+        <div class="work-role">Data Analytics Extern <span class="badge">Externship</span></div>
+        <div class="work-company">Beats by Dre · Remote</div>
+        <div class="work-duration">Mar 2025 – Jun 2025 · 4 mos</div>
+        <ul class="work-bullets">
+          <li>Built automated ETL pipelines integrating sales, customer behavior, and social media datasets into structured analytical tables for marketing dashboards</li>
+          <li>Applied NLP pipelines to transform 500K+ raw reviews into analytical features for consumer segmentation across 3 product lines</li>
+          <li>Collaborated with cross-functional teams to reduce analyst ad-hoc query time by 40%</li>
+        </ul>
+        <div class="work-tags">
+          <span class="work-tag">Python</span><span class="work-tag">SQL</span><span class="work-tag">ETL</span><span class="work-tag">NLP</span><span class="work-tag">BigQuery</span><span class="work-tag">Tableau</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT: Job 2 -->
+    <div class="work-item">
+      <div class="company-logo">🚇</div>
+      <div style="flex:1">
+        <div class="work-role">Data Engineering Capstone Project <span class="badge">Academic</span></div>
+        <div class="work-company">NJ Transit Smart Management System · Pace University</div>
+        <div class="work-duration">Jul 2025 – Oct 2025 · 4 mos</div>
+        <ul class="work-bullets">
+          <li>Designed and built a high-throughput streaming pipeline using Kafka, Spark Streaming, and Snowflake to simulate and process real-time transit event data at scale</li>
+          <li>Implemented predictive analytics models for delay forecasting, demonstrating a modeled 30% improvement in route optimization efficiency</li>
+          <li>Built a data quality and observability framework using Great Expectations and OpenLineage, cutting simulated anomaly detection time by 50%</li>
+        </ul>
+        <div class="work-tags">
+          <span class="work-tag">Kafka</span><span class="work-tag">Spark Streaming</span><span class="work-tag">Snowflake</span><span class="work-tag">Great Expectations</span><span class="work-tag">OpenLineage</span><span class="work-tag">Airflow</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT: Job 3 -->
+    <div class="work-item">
+      <div class="company-logo">💼</div>
+      <div style="flex:1">
+        <div class="work-role">Data Scientist Intern</div>
+        <div class="work-company">Techcolabs Softwares Inc · Remote</div>
+        <div class="work-duration">Dec 2022 – Apr 2023 · 5 mos</div>
+        <ul class="work-bullets">
+          <li>Built feature engineering pipelines on 1M+ mortgage records; ensemble ML models achieved 92% accuracy on prepayment risk prediction — improved workflows 30%</li>
+          <li>Led migration of 10TB from Snowflake to Apache Iceberg on S3, unlocking time-travel queries and reducing storage costs 60%</li>
+          <li>Built Kafka Streams + fine-tuned BERT pipeline for real-time PII redaction across 1M+ daily records (CCPA/GDPR compliant)</li>
+        </ul>
+        <div class="work-tags">
+          <span class="work-tag">Python</span><span class="work-tag">Kafka</span><span class="work-tag">BERT</span><span class="work-tag">Apache Iceberg</span><span class="work-tag">Snowflake</span><span class="work-tag">S3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT: Job 4 -->
+    <div class="work-item">
+      <div class="company-logo">🔬</div>
+      <div style="flex:1">
+        <div class="work-role">Data Engineer Intern</div>
+        <div class="work-company">Innovative Research Labs · Remote</div>
+        <div class="work-duration">Jul 2022 – Oct 2022 · 4 mos</div>
+        <ul class="work-bullets">
+          <li>Built ingestion and transformation pipelines for 100K+ user ratings; RDS→Redshift migration scripts cut database update time by 98%</li>
+          <li>Built LLM-powered Airflow DAG builder using transformer models to parse natural language into executable DAG configurations</li>
+          <li>Optimized dataset joins and aggregations, reducing feature generation runtime by 25%</li>
+        </ul>
+        <div class="work-tags">
+          <span class="work-tag">Python</span><span class="work-tag">SQL</span><span class="work-tag">Airflow</span><span class="work-tag">Redshift</span><span class="work-tag">RDS</span><span class="work-tag">LLMs</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EDIT: Research / awards section -->
+  <h2>Research</h2>
+  <div class="award-item">
+    <div class="award-title">Graduate Data Engineering Researcher — Pace University</div>
+    <div class="award-meta">2024 – 2025</div>
+    <div class="award-desc">Researched optimized data partitioning and caching strategies, improving query performance by 35%. Built a Great Expectations data quality monitoring framework achieving 99% data accuracy. Designed a scalable ETL pipeline for large datasets using Python, Spark, and SQL.</div>
+  </div>
+
+</div><!-- /page-work -->
+
+
+<!-- ================================================================
+     PAGE: USES
+     EDIT: tool names and descriptions — what you personally use daily
+     ================================================================ -->
+<div class="page" id="page-uses">
+  <h1>Tools I <em>actually use.</em></h1>
+  <p style="max-width:520px">The software and services that make up my daily data engineering workflow.</p>
+
+  <h2>Languages</h2>
+  <div class="uses-list">
+    <div class="uses-item">
+      <div class="uses-name">Python 3.11</div>
+      <div class="uses-desc">Primary language for all DE work — producers, Spark jobs, dbt macros, Airflow DAGs. I use uv for dependency management and won't go back.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">SQL (Snowflake)</div>
+      <div class="uses-desc">Window functions, CTEs, QUALIFY for dedup. Snowflake's VARIANT type for semi-structured data is underrated. I write SQL before I write any Python.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">PySpark 3.4</div>
+      <div class="uses-desc">Structured Streaming for real-time, Spark SQL for batch. I write transformation logic as pure functions — makes unit testing actually possible.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">Scala</div>
+      <div class="uses-desc">For performance-sensitive Spark jobs where Python overhead matters. Also used for Kafka Streams applications.</div>
+    </div>
+  </div>
+
+  <h2>Data Infrastructure</h2>
+  <div class="uses-list">
+    <div class="uses-item">
+      <div class="uses-name">Apache Kafka</div>
+      <div class="uses-desc">Confluent Cloud in production, Docker locally. Schema Registry with Avro is non-negotiable on any real project — JSON schemas are how you get paged at 3am.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">Snowflake</div>
+      <div class="uses-desc">My go-to warehouse. Auto-suspend set to 60s, CLUSTER BY for query optimization, Spark connector for streaming loads. SnowPro certified.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">Apache Iceberg</div>
+      <div class="uses-desc">For data lakehouse workloads on S3. Time-travel and schema evolution without breaking downstream consumers.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">dbt</div>
+      <div class="uses-desc">Every transformation goes through dbt. refs, tests, and docs are non-optional. Snowflake adapter with dbt-utils for generic tests.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">Apache Airflow</div>
+      <div class="uses-desc">Astronomer for managed deployments. TaskFlow API for cleaner DAG code. KubernetesPodOperator for isolation — no shared workers.</div>
+    </div>
+  </div>
+
+  <h2>Cloud & DevOps</h2>
+  <div class="uses-list">
+    <div class="uses-item">
+      <div class="uses-name">AWS</div>
+      <div class="uses-desc">S3, EMR, Glue, Lambda, RDS. Certified Solutions Architect. Primary cloud for data lake workloads.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">Docker + Kubernetes</div>
+      <div class="uses-desc">Every project ships with docker-compose.yml for one-command local setup. K8s for production Airflow and Spark.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">Terraform</div>
+      <div class="uses-desc">Nothing gets created by hand. Confluent Cloud, Snowflake resources, AWS infra — all versioned in PRs like application code.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">GitHub Actions</div>
+      <div class="uses-desc">CI on every repo: ruff, pytest, dbt compile, Docker build. Merge to main only if all 4 pass.</div>
+    </div>
+  </div>
+
+  <h2>Editor & Terminal</h2>
+  <div class="uses-list">
+    <div class="uses-item">
+      <div class="uses-name">VS Code</div>
+      <div class="uses-desc">dbt Power User extension, Ruff linter, Python extension. GitHub Dark Default theme.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">iTerm2 + zsh</div>
+      <div class="uses-desc">Oh My Zsh with powerlevel10k. Aliases for docker-compose, spark-submit, and dbt commands.</div>
+    </div>
+    <div class="uses-item">
+      <div class="uses-name">TablePlus</div>
+      <div class="uses-desc">Quick SQL against Snowflake, Postgres, Redshift without leaving my laptop. Worth every dollar.</div>
+    </div>
+  </div>
+
+</div><!-- /page-uses -->
+
+
+<!-- ================================================================
+     PAGE: CONTACT
+     EDIT: email, LinkedIn, GitHub, phone, and the status table rows
+     ================================================================ -->
+<div class="page" id="page-contact">
+  <h1>Let's <em>connect.</em></h1>
+  <p style="max-width:500px">
+    Actively interviewing for data engineering and data platform roles in New York.
+    Open to on-site, hybrid, or remote. Available for interviews now — graduating May 2026.
+  </p>
+
+  <h2>Reach out</h2>
+  <div class="contact-links-grid">
+    <!-- EDIT: Your email -->
+    <a class="contact-row" href="mailto:mansi.bhadani31@gmail.com">
+      <div class="contact-row-icon">✉</div>
+      <div>
+        <div class="contact-row-label">Email</div>
+        <div class="contact-row-value">mansi.bhadani31@gmail.com</div>
+      </div>
+    </a>
+    <!-- EDIT: Your LinkedIn URL -->
+    <a class="contact-row" href="https://linkedin.com/in/mansibhadani" target="_blank">
+      <div class="contact-row-icon" style="font-size:12px;font-weight:600">in</div>
+      <div>
+        <div class="contact-row-label">LinkedIn</div>
+        <div class="contact-row-value">linkedin.com/in/mansibhadani</div>
+      </div>
+    </a>
+    <!-- EDIT: Your GitHub URL -->
+    <a class="contact-row" href="https://github.com/mansibhadani" target="_blank">
+      <div class="contact-row-icon">⌥</div>
+      <div>
+        <div class="contact-row-label">GitHub</div>
+        <div class="contact-row-value">github.com/mansibhadani</div>
+      </div>
+    </a>
+    <!-- EDIT: Your phone number -->
+    <a class="contact-row" href="tel:+12016301123">
+      <div class="contact-row-icon">☏</div>
+      <div>
+        <div class="contact-row-label">Phone</div>
+        <div class="contact-row-value">201-630-1123</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- EDIT: Update each cs-val to reflect your current situation -->
+  <div class="contact-status-box">
+    <div class="cs-title">Candidate Status</div>
+    <div class="cs-row">
+      <div class="cs-key">Status</div>
+      <div class="cs-val open">● Actively interviewing</div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-key">Start date</div>
+      <div class="cs-val">Available now · Graduating May 2026</div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-key">Work Authorization</div>
+      <div class="cs-val">Authorized to work in the US · EAD valid through 2027</div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-key">Location</div>
+      <div class="cs-val">New York, NY</div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-key">Open to</div>
+      <div class="cs-val">On-site · Hybrid · Remote</div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-key">Target roles</div>
+      <div class="cs-val">Data Engineer · Analytics Engineer · Data Platform</div>
+    </div>
+    <div class="cs-row">
+      <div class="cs-key">Target companies</div>
+      <div class="cs-val">Meta · Google · Snowflake · Databricks · Stripe · Confluent · Top startups</div>
+    </div>
+  </div>
+
+</div><!-- /page-contact -->
+
+
+</div><!-- /content -->
+</main>
+
+<!-- ================================================================
+     JAVASCRIPT — no edits needed here
+     ================================================================ -->
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  const link = document.querySelector(`[data-page="${id}"]`);
+  if (link) link.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  history.pushState(null, '', '#' + id);
+}
+
+function copyBio() {
+  const bio = "Mansi Bhadani is a results-driven Data Engineer with hands-on experience building scalable ETL and real-time streaming pipelines. She specializes in PySpark, Kafka, and Snowflake — and has built engineering systems including a transit streaming pipeline processing millions of events daily and an NLP-powered analytics platform during her externship at Beats by Dre.";
+  navigator.clipboard.writeText(bio).then(() => {
+    const btn = document.querySelector('.copy-bio-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+// Load correct page from URL hash (e.g. yoursite.com#work)
+const hash = window.location.hash.replace('#', '');
+if (hash && document.getElementById('page-' + hash)) showPage(hash);
+
+// Arrow key navigation between pages
+const pages = ['home','about','articles','projects','work','uses','contact'];
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  const active = document.querySelector('.nav-link.active')?.dataset.page;
+  const idx = pages.indexOf(active);
+  if (e.key === 'ArrowDown' && idx < pages.length - 1) showPage(pages[idx + 1]);
+  if (e.key === 'ArrowUp'   && idx > 0)               showPage(pages[idx - 1]);
+});
+</script>
+
+</body>
+</html>
